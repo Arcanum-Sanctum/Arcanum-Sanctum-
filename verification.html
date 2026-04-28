@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcanum Sanctum — Verification</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  background:#0A0812;
+  color:#EDE8DC;
+  font-family:'Rajdhani',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.container {
+  width:420px;
+  background:#0F0D1A;
+  border:1px solid rgba(201,168,76,.2);
+  padding:28px;
+}
+
+h2 {
+  font-family:'Cinzel',serif;
+  text-align:center;
+  margin-bottom:20px;
+  color:#C9A84C;
+}
+
+label {
+  font-size:12px;
+  margin-top:12px;
+  display:block;
+  color:rgba(201,168,76,.7);
+}
+
+input, select {
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  background:#141220;
+  border:1px solid rgba(201,168,76,.2);
+  color:#EDE8DC;
+}
+
+input[type="file"] {
+  padding:6px;
+}
+
+button {
+  width:100%;
+  margin-top:20px;
+  padding:12px;
+  background:transparent;
+  border:1px solid rgba(201,168,76,.5);
+  color:#C9A84C;
+  cursor:pointer;
+  letter-spacing:.15em;
+  transition:.2s;
+}
+
+button:hover {
+  background:rgba(201,168,76,.1);
+}
+
+.status {
+  margin-top:12px;
+  font-size:12px;
+  color:rgba(201,168,76,.6);
+  text-align:center;
+}
+
+.loader {
+  display:none;
+  margin-top:10px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Verification</h2>
+
+  <form onsubmit="submitForm(event)">
+
+    <label>UID</label>
+    <input type="text" id="uid" required>
+
+    <label>Platform</label>
+    <select id="platform" onchange="setReferrer()" required>
+      <option value="">Select Platform</option>
+      <option value="Bitget">Bitget</option>
+      <option value="BingX">BingX</option>
+      <option value="Blofin">Blofin</option>
+    </select>
+
+    <label>Referrer</label>
+    <input type="text" id="referrer" readonly>
+
+    <label>Upload Deposit Screenshot ($50 minimum)</label>
+    <input type="file" id="screenshot" accept="image/*" required>
+
+    <button type="submit" id="submitBtn">Submit Verification</button>
+
+    <div class="loader" id="loader">⏳ Processing...</div>
+    <div class="status" id="statusText"></div>
+
+  </form>
+</div>
+
+<script>
+
+// AUTO REFERRER LOCK
+function setReferrer() {
+  const platform = document.getElementById("platform").value;
+  const ref = document.getElementById("referrer");
+
+  if (platform === "Bitget") ref.value = "KazzyBTG";
+  else if (platform === "BingX") ref.value = "KazzyBX";
+  else if (platform === "Blofin") ref.value = "KazzyBF";
+  else ref.value = "";
+}
+
+// SUBMIT FUNCTION
+function submitForm(e) {
+  e.preventDefault();
+
+  const btn = document.getElementById("submitBtn");
+  const status = document.getElementById("statusText");
+  const loader = document.getElementById("loader");
+
+  btn.disabled = true;
+  btn.innerText = "Submitting...";
+  loader.style.display = "block";
+  status.innerText = "Uploading your verification...";
+
+  const formData = new FormData();
+  formData.append("uid", document.getElementById("uid").value);
+  formData.append("platform", document.getElementById("platform").value);
+  formData.append("referrer", document.getElementById("referrer").value);
+  formData.append("file", document.getElementById("screenshot").files[0]);
+
+  fetch("https://script.google.com/macros/s/AKfycbzOshasH_xRYfl0WxcFLdop6KycUO7g-d04w7ekB7ABnoKSZ7IeX7UWBeGfX6ODesWz/exec", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(() => {
+    status.innerText = "Submission successful. Redirecting...";
+    setTimeout(() => {
+      window.location.href = "sanctum_submitted.html";
+    }, 1200);
+  })
+  .catch(() => {
+    status.innerText = "Submission failed. Try again.";
+    btn.disabled = false;
+    btn.innerText = "Submit Verification";
+    loader.style.display = "none";
+  });
+}
+
+</script>
+
+</body>
+</html>
